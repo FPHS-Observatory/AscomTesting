@@ -1,0 +1,6 @@
+# Visual Studio Things
+.vs\
+
+# Build Files
+*\bin\
+*\obj\
