@@ -88,19 +88,26 @@ namespace AscomTesting
                     break;
 
                 case SensorType.RGGB:
-                    ReadDataColorRGGB(resX, resY, cam.ImageArray as int[,], result);
+                    // Here and below, the "ref" keyword is used. This guarantees that
+                    // the parameter is passed as a reference (including "structs," which
+                    // are value-types and would normally be copied). For classes, it
+                    // makes much less of a difference. Here, though, for reasons specified
+                    // in the method, we need to resize the bitmap and we do that by creating
+                    // a new one and setting the existing reference to a new value. This would
+                    // not be possible without specifying "ref".
+                    ReadDataColorRGGB(resX, resY, cam.ImageArray as int[,], ref result);
                     break;
 
                 case SensorType.CMYG:
-                    ReadDataColorCMYG(resX, resY, cam.ImageArray as int[,], result);
+                    ReadDataColorCMYG(resX, resY, cam.ImageArray as int[,], ref result);
                     break;
 
                 case SensorType.CMYG2:
-                    ReadDataColorCMYG2(resX, resY, cam.ImageArray as int[,], result);
+                    ReadDataColorCMYG2(resX, resY, cam.ImageArray as int[,], ref result);
                     break;
 
                 case SensorType.LRGB:
-                    ReadDataColorLRGB(resX, resY, cam.ImageArray as int[,], result);
+                    ReadDataColorLRGB(resX, resY, cam.ImageArray as int[,], ref result);
                     break;
             }
             string filename = "result.bmp";
@@ -196,24 +203,86 @@ namespace AscomTesting
                 }
             }
         }
-        public static void ReadDataColorRGGB(int width, int height, int[,] data, Bitmap result)
+        public static void ReadDataColorRGGB(int width, int height, int[,] data, ref Bitmap result)
         {
-            // TODO: I'll make this later.
-            throw new NotImplementedException();
+            // Four indices per pixel. TL is red, TR is green, BL is green2, BR is blue.
+            // Luckily the two greens are always identical, so it's not a double-size color value.
+            // However, since each pixel is really a 2x2 block of data, the image is half as wide
+            // and half as tall. I think, it doesn't seem like I can safely increase the X beyond
+            // the width, despite that meaning that it captures less stuff.
+            result.Dispose();
+            result = new Bitmap(width / 2, height / 2);
+
+            // Determine brightness ceiling.
+            int maxValue = 0;
+            for (int x = 0; x < width; x += 2)
+            {
+                for (int y = 0; y < height; y += 2)
+                {
+                    int rawR  = data[x    , y    ],
+                        rawG1 = data[x + 1, y    ],
+                        rawG2 = data[x    , y + 1],
+                        rawB  = data[x + 1, y + 1];
+
+                    if (rawR > maxValue) maxValue = rawR;
+                    if (rawG1 > maxValue) maxValue = rawG1;
+                    if (rawG2 > maxValue) maxValue = rawG2;
+                    if (rawB > maxValue) maxValue = rawB;
+                }
+            }
+
+            bool shownError = false;
+            for (int x = 0; x < width; x += 2)
+            {
+                for (int y = 0; y < height; y += 2)
+                {
+                    int rawR  = data[x    , y    ],
+                        rawG1 = data[x + 1, y    ],
+                        rawG2 = data[x    , y + 1],
+                        rawB  = data[x + 1, y + 1];
+
+                    int rawG;
+
+                    if (rawG1 != rawG2)
+                    {
+                        if (!shownError)
+                        {
+                            // If the two green values actually are different, I'll display a warning.
+                            // The simulator doesn't have them different, but a true camera might.
+                            Console.Write(" G1 != G2!");
+                        }
+                        // Set them to their average, since we can only have one true green value.
+                        // Could be optimized with bitshifts (as could the loops), but it doesn't
+                        // really matter in a debug context and it makes things clearer.
+                        rawG = rawG1 / 2 + rawG2 / 2;
+                    }
+                    else rawG = rawG1;
+
+                    double rf = rawR / (double)maxValue,
+                           gf = rawG / (double)maxValue,
+                           bf = rawB / (double)maxValue;
+                    byte r = (byte)(rf * byte.MaxValue),
+                         g = (byte)(gf * byte.MaxValue),
+                         b = (byte)(bf * byte.MaxValue);
+
+                    int color = (0xFF << 24) | (r << 16) | (g << 8) | b;
+                    result.SetPixel(x / 2, y / 2, Color.FromArgb(color));
+                }
+            }
         }
-        public static void ReadDataColorCMYG(int width, int height, int[,] data, Bitmap result)
+        public static void ReadDataColorCMYG(int width, int height, int[,] data, ref Bitmap result)
         {
             // TODO: I'll make this later.
             //       Might take longer, because I'm not super versed in CMYK->RGB conversions.
             throw new NotImplementedException();
         }
-        public static void ReadDataColorCMYG2(int width, int height, int[,] data, Bitmap result)
+        public static void ReadDataColorCMYG2(int width, int height, int[,] data, ref Bitmap result)
         {
             // TODO: I'll make this later.
             //       Might take longer, because I'm not super versed in CMYK->RGB conversions.
             throw new NotImplementedException();
         }
-        public static void ReadDataColorLRGB(int width, int height, int[,] data, Bitmap result)
+        public static void ReadDataColorLRGB(int width, int height, int[,] data, ref Bitmap result)
         {
             // TODO: I'll make this later.
             throw new NotImplementedException();

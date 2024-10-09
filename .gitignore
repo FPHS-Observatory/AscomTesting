@@ -1,6 +1,6 @@
 # Visual Studio Things
-.vs\
+.vs/
 
 # Build Files
-*\bin\
-*\obj\
+*/bin/
+*/obj/
