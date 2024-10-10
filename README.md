@@ -7,7 +7,14 @@ I'll be adding to this stuff.
 
 The NuGet package works great, no need to install it on your end.
 
-You definitely need *.NET Framework 4.7.2* though.
+You definitely need .NET Framework ~~4.7.2~~ **4.6** though.
+I'm not sure which one we'll use yet. I'm leaning towards 4.6 because
+it's preinstalled on all Windows 10 machines (not the SDK, just the
+runtime). ASCOM itself was built with 4.7.2, so we do get a warning
+for downgrading, but it doesn't cause any issues as far as I know.
+
+And as far as I know, you can't publish a self-contained .NET Framework
+app like you can with .NET Core.
 
 After that it should build just fine. Let me know if it doesn't.
 
