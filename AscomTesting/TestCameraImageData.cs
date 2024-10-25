@@ -1,11 +1,13 @@
 ﻿using ASCOM.DeviceInterface;
 using ASCOM.DriverAccess;
+using AscomTesting.Forms;
 using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Reflection;
 using System.Threading;
+using System.Windows.Forms;
 
 namespace AscomTesting
 {
@@ -120,14 +122,9 @@ namespace AscomTesting
 
             if (key.KeyChar == 'y')
             {
-                // Open the file. Find the location of the program and then use that to open the image.
-                // The '@' here tells the string to not determine any escape codes. Makes things easier
-                // for file paths. Still works with interpolation if you specify the '$'.
-                string location = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                string fileLocation = location + $@"\{filename}";
-                Console.WriteLine($"Opening image at {fileLocation}");
-                Process proc = Process.Start(fileLocation);
-                proc.WaitForExit();
+                // Open the image in a little viewer I made real quick.
+                ImageViewer viewer = new ImageViewer(result);
+                Application.Run(viewer); // Waits for the form to be closed.
             }
         }
 
