@@ -145,6 +145,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AscomTestAttribute.cs" />
     <Compile Include="Forms\ImageViewer.cs">
       <SubType>Form</SubType>
     </Compile>

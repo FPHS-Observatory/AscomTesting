@@ -8,6 +8,7 @@ using System.Windows.Forms;
 
 namespace AscomTesting
 {
+    [AscomTest]
     public static class TestCameraImageData
     {
         public static void Run()

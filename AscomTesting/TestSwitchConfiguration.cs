@@ -6,6 +6,7 @@ using System.Threading;
 
 namespace AscomTesting
 {
+    [AscomTest]
     public static class TestSwitchConfiguration
     {
         public static void Run()
