@@ -16,7 +16,7 @@ namespace AscomTesting
                           "Actions: Goes through each switch and attempts to turn it on and off.\n\n" +
                           "Press enter to continue > "); Console.ReadLine();
 
-
+            
 
             string switchId = Switch.Choose("ASCOM.Simulator.Switch");
             if (string.IsNullOrWhiteSpace(switchId))
@@ -88,6 +88,8 @@ namespace AscomTesting
                 }
             }
             else Console.WriteLine(" None");
+
+            controller.Dispose();
         }
     }
 }

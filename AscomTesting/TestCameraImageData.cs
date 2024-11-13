@@ -121,6 +121,8 @@ namespace AscomTesting
                 ImageViewer viewer = new ImageViewer(result);
                 Application.Run(viewer); // Waits for the form to be closed.
             }
+
+            cam.Dispose();
         }
 
         // All of these use dynamic scaling because the values we get are not clamped to
