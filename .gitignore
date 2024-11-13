@@ -4,3 +4,6 @@
 # Build Files
 */bin/
 */obj/
+
+# Automatically created by NuGet when building/restoring:
+packages/

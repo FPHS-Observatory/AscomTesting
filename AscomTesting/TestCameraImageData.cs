@@ -2,10 +2,7 @@
 using ASCOM.DriverAccess;
 using AscomTesting.Forms;
 using System;
-using System.Diagnostics;
 using System.Drawing;
-using System.IO;
-using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -25,7 +22,7 @@ namespace AscomTesting
 
             // Select camera from the chooser. This morning I was
             // using the general chooser, but we can also do this.
-            string camId = Camera.Choose(""); // In quotes is the default ID.
+            string camId = Camera.Choose("ASCOM.Simulator.Camera"); // In quotes is the default ID.
             if (string.IsNullOrWhiteSpace(camId))
             {
                 Console.WriteLine("No selection has been made! Cancelling.");
@@ -56,11 +53,8 @@ namespace AscomTesting
 
             Console.Write("Starting exposure...");
             cam.StartExposure(exposure, false);
-            Thread.Sleep((int)(exposure * 1100) + 500);
-            // The sleep call gives some extra time. 110% * time + 0.5s.
-            // TODO: The properties "ImageReady" and "CameraState" might
-            //       be able to improve this beyond just a simple waiting
-            //       script, but I won't use that for this test.
+
+            while (!cam.ImageReady) Thread.Sleep(100); // Wait for the image to complete.
             Console.WriteLine(" Complete");
 
             int resX = cam.CameraXSize, resY = cam.CameraYSize;
@@ -112,7 +106,7 @@ namespace AscomTesting
                     ReadDataColorLRGB(resX, resY, cam.ImageArray as int[,], ref result);
                     break;
             }
-            string filename = "result.bmp";
+            string filename = "result.png";
             result.Save(filename);
             Console.WriteLine(" Complete");
 
